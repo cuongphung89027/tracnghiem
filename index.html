@@ -7,12 +7,32 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f4f4f4;
+      min-height: 100vh;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #overlay-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
     }
 
     .quiz-container {
@@ -23,6 +43,7 @@
       width: 600px;
       max-height: 90vh;
       overflow-y: auto;
+      display: none;
     }
 
     #upload-container {
@@ -123,22 +144,6 @@
       background-color: #fcbdbd;
     }
 
-    .answer {
-      padding: 10px;
-      border-radius: 4px;
-      margin-bottom: 5px;
-    }
-
-    .answer.correct {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .answer.incorrect {
-      background-color: #f44336;
-      color: white;
-    }
-
     #shuffle-button {
       color: black;
       padding: 6px 12px;
@@ -154,233 +159,266 @@
       font-weight: bold;
       text-align: center;
     }
+
+    #greeting {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <div class="quiz-container">
-    <div id="upload-container">
-      <select id="subject-select" onchange="loadSubjectFile(this.value)">
-        <option value="">-- Chọn môn học --</option>
-        <option value="kinhtechinhtri.txt">Kinh tế chính trị</option>
-        <option value="chinhtrihoc.txt">Chính trị học</option>
-        <option value="xahoihoc.txt">Xã hội học</option>
-        <option value="quanhequocte.txt">Quan hệ quốc tế</option>
-      </select>
-      <button id="shuffle-button" onclick="shuffleQuestions()">Trộn câu hỏi</button>
-    </div>
+<div id="overlay">
+  <div id="overlay-content">
+    <h3>Nhập mã sinh viên</h3>
+    <input type="text" id="student-id" placeholder="VD: 1234567890" style="width: 100%; padding: 10px; margin: 10px 0;" />
+    <button onclick="verifyStudent()">Xác nhận</button>
+    <p id="student-msg" style="color: red; margin-top: 10px;"></p>
+  </div>
+</div>
 
-    <div id="question-container">
-      <h2 id="question-text">Đang tải câu hỏi...</h2>
-      <ul id="answers">
-        <li onclick="checkAnswer(this)"></li>
-        <li onclick="checkAnswer(this)"></li>
-        <li onclick="checkAnswer(this)"></li>
-        <li onclick="checkAnswer(this)"></li>
-      </ul>
-    </div>
-
-    <div id="question-status">
-      Câu hỏi: <span id="question-count">0</span> / <span id="total-questions">0</span>
-    </div>
-
-    <div style="display: flex; justify-content: space-between;">
-      <button id="back-button" onclick="prevQuestion()" disabled>Quay lại</button>
-      <button id="next-button" onclick="nextQuestion()" disabled>Tiếp tục</button>
-    </div>
-
-    <button id="submit-button" onclick="submitQuiz()" disabled>Nộp bài</button>
-    <button id="incorrect-list-button" onclick="showIncorrectQuestions()">Hiển thị câu sai</button>
-
-    <div id="result-message"></div>
-
-    <div id="incorrect-list-container" style="display: none;">
-      <ul id="incorrect-list"></ul>
-    </div>
+<div class="quiz-container" id="quiz-app">
+  <div id="greeting"></div>
+  <div id="upload-container">
+    <select id="subject-select" onchange="loadSubjectFile(this.value)">
+      <option value="">-- Chọn môn học --</option>
+      <option value="kinhtechinhtri.txt">Kinh tế chính trị</option>
+      <option value="chinhtrihoc.txt">Chính trị học</option>
+      <option value="xahoihoc.txt">Xã hội học</option>
+      <option value="quanhequocte.txt">Quan hệ quốc tế</option>
+    </select>
+    <button id="shuffle-button" onclick="shuffleQuestions()">Trộn câu hỏi</button>
   </div>
 
-  <script>
-    let currentQuestionIndex = 0;
-    let questions = [];
-    let originalQuestions = [];
-    let userAnswers = [];
-    let totalCorrectAnswers = 0;
-    let submitted = false;
+  <div id="question-container">
+    <h2 id="question-text">Đang tải câu hỏi...</h2>
+    <ul id="answers">
+      <li onclick="checkAnswer(this)"></li>
+      <li onclick="checkAnswer(this)"></li>
+      <li onclick="checkAnswer(this)"></li>
+      <li onclick="checkAnswer(this)"></li>
+    </ul>
+  </div>
 
-    function loadSubjectFile(filename) {
-      if (!filename) return;
-      const url = `https://raw.githubusercontent.com/cuongphung89027/tracnghiem/main/${filename}`;
-      fetch(url)
-        .then(response => {
-          if (!response.ok) throw new Error("Không thể tải file");
-          return response.text();
-        })
-        .then(content => {
-          parseQuestions(content);
-          userAnswers = new Array(questions.length).fill(null);
-          originalQuestions = JSON.parse(JSON.stringify(questions));
-          currentQuestionIndex = 0;
-          submitted = false;
-          updateSubmitButton();
-          document.getElementById('incorrect-list-button').style.display = 'none';
-          showQuestion();
-          document.getElementById('result-message').innerText = '';
-          document.getElementById('incorrect-list-container').style.display = "none";
-        })
-        .catch(err => {
-          alert("Lỗi tải file: " + err.message);
-        });
-    }
+  <div id="question-status">
+    Câu hỏi: <span id="question-count">0</span> / <span id="total-questions">0</span>
+  </div>
 
-    function parseQuestions(content) {
-      questions = [];
-      const lines = content.split("\n");
-      let currentQuestion = '';
-      let answers = [];
+  <div style="display: flex; justify-content: space-between;">
+    <button id="back-button" onclick="prevQuestion()" disabled>Quay lại</button>
+    <button id="next-button" onclick="nextQuestion()" disabled>Tiếp tục</button>
+  </div>
 
-      lines.forEach(line => {
-        line = line.trim();
-        if (!line) return;
+  <button id="submit-button" onclick="submitQuiz()" disabled>Nộp bài</button>
+  <button id="incorrect-list-button" onclick="showIncorrectQuestions()">Hiển thị câu sai</button>
+  <div id="result-message"></div>
+  <div id="incorrect-list-container" style="display: none;">
+    <ul id="incorrect-list"></ul>
+  </div>
+</div>
 
-        if (line.match(/^\d+\./)) {
-          if (currentQuestion) questions.push({ question: currentQuestion, answers });
-          currentQuestion = line;
-          answers = [];
-        } else {
-          const isCorrect = line.startsWith("*");
-          answers.push({ text: isCorrect ? line.slice(1).trim() : line.trim(), isCorrect });
+<script>
+let currentQuestionIndex = 0;
+let questions = [];
+let originalQuestions = [];
+let userAnswers = [];
+let totalCorrectAnswers = 0;
+let submitted = false;
+let studentName = "";
+
+function verifyStudent() {
+  const inputId = document.getElementById("student-id").value.trim().toUpperCase();
+  fetch("https://raw.githubusercontent.com/cuongphung89027/tracnghiem/main/sinhvien.txt")
+    .then(res => res.text())
+    .then(data => {
+      const lines = data.split('\n').map(line => line.trim());
+      for (const line of lines) {
+        if (!line) continue;
+        const hasAccess = line.startsWith("*");
+        const cleanLine = hasAccess ? line.slice(1).trim() : line;
+        const parts = cleanLine.split(/\s+/);
+        const id = parts[0].toUpperCase();
+        const name = parts.slice(1).join(" ");
+        if (id === inputId) {
+          if (!hasAccess) {
+            document.getElementById("student-msg").innerText = `Xin chào ${name}, mã sinh viên của bạn chưa được cấp quyền truy cập.`;
+            return;
+          }
+          studentName = name;
+          document.getElementById("overlay").style.display = "none";
+          document.getElementById("quiz-app").style.display = "block";
+          document.getElementById("greeting").innerText = `Xin chào ${studentName}`;
+          return;
         }
-      });
-
-      if (currentQuestion) questions.push({ question: currentQuestion, answers });
-      document.getElementById('submit-button').disabled = questions.length === 0;
-    }
-
-    function showQuestion() {
-      const question = questions[currentQuestionIndex];
-      document.getElementById('question-text').innerText = question.question;
-
-      const answers = document.querySelectorAll("#answers li");
-      answers.forEach((li, index) => {
-        li.innerText = question.answers[index]?.text || "";
-        li.className = "";
-        if (userAnswers[currentQuestionIndex] === question.answers[index]?.text) {
-          li.classList.add("selected");
-        }
-      });
-
-      document.getElementById("question-count").innerText = currentQuestionIndex + 1;
-      document.getElementById("total-questions").innerText = questions.length;
-
-      document.getElementById("back-button").disabled = currentQuestionIndex === 0;
-      document.getElementById("next-button").disabled = userAnswers[currentQuestionIndex] == null;
-    }
-
-    function checkAnswer(selected) {
-      const answers = document.querySelectorAll("#answers li");
-      answers.forEach(li => li.classList.remove("selected", "correct", "incorrect"));
-
-      const question = questions[currentQuestionIndex];
-      const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
-
-      selected.classList.add("selected");
-      userAnswers[currentQuestionIndex] = selected.innerText;
-
-      if (selected.innerText === correctAnswer) {
-        selected.classList.add("correct");
-      } else {
-        selected.classList.add("incorrect");
-        const correctLi = Array.from(answers).find(li => li.innerText === correctAnswer);
-        if (correctLi) correctLi.classList.add("correct");
       }
+      document.getElementById("student-msg").innerText = "Mã sinh viên không tồn tại trong hệ thống.";
+    })
+    .catch(() => {
+      document.getElementById("student-msg").innerText = "Không thể tải danh sách sinh viên.";
+    });
+}
 
-      document.getElementById("next-button").disabled = false;
-    }
-
-    function nextQuestion() {
-      if (currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
-        showQuestion();
-      }
-    }
-
-    function prevQuestion() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-      }
-    }
-
-    function submitQuiz() {
-      if (!submitted) {
-        totalCorrectAnswers = questions.reduce((sum, question, index) => {
-          const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
-          return sum + (userAnswers[index] === correctAnswer ? 1 : 0);
-        }, 0);
-
-        const percent = ((totalCorrectAnswers / questions.length) * 100).toFixed(1);
-        const msg = `🎉 Bạn trả lời đúng ${totalCorrectAnswers}/${questions.length} câu (${percent}%)`;
-        document.getElementById("result-message").innerText = msg;
-        submitted = true;
-        updateSubmitButton();
-        document.getElementById("incorrect-list-button").style.display = "block";
-        document.getElementById("incorrect-list-container").style.display = "none";
-      } else {
-        questions = JSON.parse(JSON.stringify(originalQuestions));
-        userAnswers = new Array(questions.length).fill(null);
-        currentQuestionIndex = 0;
-        submitted = false;
-        updateSubmitButton();
-        document.getElementById('result-message').innerText = '';
-        document.getElementById("incorrect-list-button").style.display = "none";
-        document.getElementById("incorrect-list-container").style.display = "none";
-        showQuestion();
-      }
-    }
-
-    function updateSubmitButton() {
-      const submitBtn = document.getElementById("submit-button");
-      submitBtn.innerText = submitted ? "Làm lại bài" : "Nộp bài";
-    }
-
-    function showIncorrectQuestions() {
-      const incorrectList = document.getElementById("incorrect-list");
-      incorrectList.innerHTML = "";
-
-      questions.forEach((question, index) => {
-        const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
-        if (userAnswers[index] && userAnswers[index] !== correctAnswer) {
-          const li = document.createElement("li");
-          li.innerHTML = `
-            <div>${question.question}</div>
-            <div class="answer incorrect">Bạn đã chọn: ${userAnswers[index]}</div>
-            <div class="answer correct">Đáp án đúng: ${correctAnswer}</div>
-          `;
-          li.onclick = () => {
-            currentQuestionIndex = index;
-            showQuestion();
-          };
-          incorrectList.appendChild(li);
-        }
-      });
-
-      document.getElementById("incorrect-list-container").style.display = "block";
-    }
-
-    function shuffleQuestions() {
-      if (questions.length === 0) return;
-      for (let i = questions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [questions[i], questions[j]] = [questions[j], questions[i]];
-      }
+function loadSubjectFile(filename) {
+  if (!filename) return;
+  const url = `https://raw.githubusercontent.com/cuongphung89027/tracnghiem/main/${filename}`;
+  fetch(url)
+    .then(response => {
+      if (!response.ok) throw new Error("Không thể tải file");
+      return response.text();
+    })
+    .then(content => {
+      parseQuestions(content);
       userAnswers = new Array(questions.length).fill(null);
+      originalQuestions = JSON.parse(JSON.stringify(questions));
       currentQuestionIndex = 0;
       submitted = false;
       updateSubmitButton();
-      document.getElementById("result-message").innerText = '';
-      document.getElementById("incorrect-list-button").style.display = "none";
-      document.getElementById("incorrect-list-container").style.display = "none";
+      document.getElementById('incorrect-list-button').style.display = 'none';
       showQuestion();
+      document.getElementById('result-message').innerText = '';
+      document.getElementById('incorrect-list-container').style.display = "none";
+    })
+    .catch(err => {
+      alert("Lỗi tải file: " + err.message);
+    });
+}
+
+function parseQuestions(content) {
+  questions = [];
+  const lines = content.split("\n");
+  let currentQuestion = '';
+  let answers = [];
+  lines.forEach(line => {
+    line = line.trim();
+    if (!line) return;
+    if (line.match(/^\d+\./)) {
+      if (currentQuestion) questions.push({ question: currentQuestion, answers });
+      currentQuestion = line;
+      answers = [];
+    } else {
+      const isCorrect = line.startsWith("*");
+      answers.push({ text: isCorrect ? line.slice(1).trim() : line.trim(), isCorrect });
     }
-  </script>
+  });
+  if (currentQuestion) questions.push({ question: currentQuestion, answers });
+  document.getElementById('submit-button').disabled = questions.length === 0;
+}
+
+function showQuestion() {
+  const question = questions[currentQuestionIndex];
+  document.getElementById('question-text').innerText = question.question;
+  const answers = document.querySelectorAll("#answers li");
+  answers.forEach((li, index) => {
+    li.innerText = question.answers[index]?.text || "";
+    li.className = "";
+    if (userAnswers[currentQuestionIndex] === question.answers[index]?.text) {
+      li.classList.add("selected");
+    }
+  });
+  document.getElementById("question-count").innerText = currentQuestionIndex + 1;
+  document.getElementById("total-questions").innerText = questions.length;
+  document.getElementById("back-button").disabled = currentQuestionIndex === 0;
+  document.getElementById("next-button").disabled = userAnswers[currentQuestionIndex] == null;
+}
+
+function checkAnswer(selected) {
+  const answers = document.querySelectorAll("#answers li");
+  answers.forEach(li => li.classList.remove("selected", "correct", "incorrect"));
+  const question = questions[currentQuestionIndex];
+  const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
+  selected.classList.add("selected");
+  userAnswers[currentQuestionIndex] = selected.innerText;
+  if (selected.innerText === correctAnswer) {
+    selected.classList.add("correct");
+  } else {
+    selected.classList.add("incorrect");
+    const correctLi = Array.from(answers).find(li => li.innerText === correctAnswer);
+    if (correctLi) correctLi.classList.add("correct");
+  }
+  document.getElementById("next-button").disabled = false;
+}
+
+function nextQuestion() {
+  if (currentQuestionIndex < questions.length - 1) {
+    currentQuestionIndex++;
+    showQuestion();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestionIndex > 0) {
+    currentQuestionIndex--;
+    showQuestion();
+  }
+}
+
+function submitQuiz() {
+  if (!submitted) {
+    totalCorrectAnswers = questions.reduce((sum, question, index) => {
+      const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
+      return sum + (userAnswers[index] === correctAnswer ? 1 : 0);
+    }, 0);
+    const percent = ((totalCorrectAnswers / questions.length) * 100).toFixed(1);
+    document.getElementById("result-message").innerText = `🎉 Bạn trả lời đúng ${totalCorrectAnswers}/${questions.length} câu (${percent}%)`;
+    submitted = true;
+    updateSubmitButton();
+    document.getElementById("incorrect-list-button").style.display = "block";
+    document.getElementById("incorrect-list-container").style.display = "none";
+  } else {
+    questions = JSON.parse(JSON.stringify(originalQuestions));
+    userAnswers = new Array(questions.length).fill(null);
+    currentQuestionIndex = 0;
+    submitted = false;
+    updateSubmitButton();
+    document.getElementById('result-message').innerText = '';
+    document.getElementById("incorrect-list-button").style.display = "none";
+    document.getElementById("incorrect-list-container").style.display = "none";
+    showQuestion();
+  }
+}
+
+function updateSubmitButton() {
+  document.getElementById("submit-button").innerText = submitted ? "Làm lại bài" : "Nộp bài";
+}
+
+function showIncorrectQuestions() {
+  const incorrectList = document.getElementById("incorrect-list");
+  incorrectList.innerHTML = "";
+  questions.forEach((question, index) => {
+    const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
+    if (userAnswers[index] && userAnswers[index] !== correctAnswer) {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div>${question.question}</div>
+        <div class="answer incorrect">Bạn đã chọn: ${userAnswers[index]}</div>
+        <div class="answer correct">Đáp án đúng: ${correctAnswer}</div>
+      `;
+      li.onclick = () => {
+        currentQuestionIndex = index;
+        showQuestion();
+      };
+      incorrectList.appendChild(li);
+    }
+  });
+  document.getElementById("incorrect-list-container").style.display = "block";
+}
+
+function shuffleQuestions() {
+  if (questions.length === 0) return;
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  userAnswers = new Array(questions.length).fill(null);
+  currentQuestionIndex = 0;
+  submitted = false;
+  updateSubmitButton();
+  document.getElementById("result-message").innerText = '';
+  document.getElementById("incorrect-list-button").style.display = "none";
+  document.getElementById("incorrect-list-container").style.display = "none";
+  showQuestion();
+}
+</script>
 </body>
 </html>
