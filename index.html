@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIZEE by FINN</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        #answers li {
+            list-style-type: none;
+            background-color: #f1f1f1;
+            margin: 10px 0;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        #answers li:hover {
+            background-color: #ddd;
+        }
+
+        .correct {
+            background-color: #4CAF50 !important;
+            color: white;
+        }
+
+        .incorrect {
+            background-color: #f44336 !important;
+            color: white;
+        }
+
+        .highlight-correct {
+            border: 2px solid #4CAF50;
+        }
+
+        #next-button, #back-button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 48%;
+        }
+
+        #next-button:disabled, #back-button:disabled {
+            background-color: #ccc;
+        }
+
+        #submit-button {
+            background-color: #f44336;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        #incorrect-list-button {
+            background-color: #FF9800;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        #incorrect-list-container {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        #incorrect-list-container li {
+            list-style-type: none;
+            padding: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #f44336;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #ffdddd;
+        }
+
+        #incorrect-list-container li:hover {
+            background-color: #fcbdbd;
+        }
+
+        .answer {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .answer.correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .answer.incorrect {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #shuffle-button {
+            color: black;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: auto;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div id="upload-container">
+            <select id="subject-select" onchange="loadSubjectFile(this.value)">
+                <option value="">-- Chọn môn học --</option>
+                <option value="kinhtechinhtri.txt">Kinh tế chính trị</option>
+                <option value="chinhtrihoc.txt">Chính trị học</option>
+                <option value="xahoihoc.txt">Xã hội học</option>
+                <option value="quanhequocte.txt">Quan hệ quốc tế</option>
+            </select>
+            <button id="shuffle-button" onclick="shuffleQuestions()">Trộn câu hỏi</button>
+        </div>
+
+        <div id="question-container">
+            <h2 id="question-text">Đang tải câu hỏi...</h2>
+            <ul id="answers">
+                <li onclick="checkAnswer(this)"></li>
+                <li onclick="checkAnswer(this)"></li>
+                <li onclick="checkAnswer(this)"></li>
+                <li onclick="checkAnswer(this)"></li>
+            </ul>
+        </div>
+
+        <div id="question-status">
+            Câu hỏi: <span id="question-count">0</span> / <span id="total-questions">0</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between;">
+            <button id="back-button" onclick="prevQuestion()" disabled>Quay lại</button>
+            <button id="next-button" onclick="nextQuestion()" disabled>Tiếp tục</button>
+        </div>
+
+        <button id="submit-button" onclick="submitQuiz()" disabled>Nộp bài</button>
+        <button id="incorrect-list-button" onclick="showIncorrectQuestions()">Hiển thị câu sai</button>
+
+        <div id="incorrect-list-container" style="display: none;">
+            <ul id="incorrect-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestionIndex = 0;
+        let questions = [];
+        let userAnswers = JSON.parse(localStorage.getItem('userAnswers')) || [];
+        let totalCorrectAnswers = 0;
+
+        function loadSubjectFile(filename) {
+            if (!filename) return;
+            const url = `https://raw.githubusercontent.com/cuongphung89027/tracnghiem/main/${filename}`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Không thể tải file');
+                    return response.text();
+                })
+                .then(content => {
+                    parseQuestions(content);
+                    userAnswers = [];
+                    localStorage.removeItem('userAnswers');
+                    showQuestion();
+                })
+                .catch(err => {
+                    alert("Lỗi tải file: " + err.message);
+                });
+        }
+
+        function parseQuestions(content) {
+            questions = [];
+            const lines = content.split('\n');
+            let currentQuestion = '';
+            let answers = [];
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                if (line.match(/^\d+\./)) {
+                    if (currentQuestion) questions.push({ question: currentQuestion, answers });
+                    currentQuestion = line;
+                    answers = [];
+                } else {
+                    const isCorrect = line.startsWith('*');
+                    answers.push({ text: isCorrect ? line.slice(1).trim() : line.trim(), isCorrect });
+                }
+            });
+
+            if (currentQuestion) questions.push({ question: currentQuestion, answers });
+        }
+
+        function shuffleQuestions() {
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+            currentQuestionIndex = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('question-text').innerText = question.question;
+
+            const answers = document.querySelectorAll('#answers li');
+            answers.forEach((li, index) => {
+                li.innerText = question.answers[index]?.text || '';
+                li.classList.remove('correct', 'incorrect', 'selected', 'highlight-correct');
+                if (userAnswers[currentQuestionIndex] === question.answers[index]?.text) li.classList.add('selected');
+            });
+
+            document.getElementById('question-count').innerText = currentQuestionIndex + 1;
+            document.getElementById('total-questions').innerText = questions.length;
+
+            document.getElementById('back-button').disabled = currentQuestionIndex === 0;
+            document.getElementById('next-button').disabled = !userAnswers[currentQuestionIndex];
+            document.getElementById('submit-button').disabled = questions.length === 0;
+        }
+
+        function checkAnswer(selected) {
+            const answers = document.querySelectorAll('#answers li');
+            answers.forEach(li => li.classList.remove('selected', 'correct', 'incorrect'));
+
+            const question = questions[currentQuestionIndex];
+            const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
+
+            selected.classList.add('selected');
+            userAnswers[currentQuestionIndex] = selected.innerText;
+
+            if (selected.innerText === correctAnswer) {
+                selected.classList.add('correct');
+            } else {
+                selected.classList.add('incorrect');
+                const correctLi = Array.from(answers).find(li => li.innerText === correctAnswer);
+                if (correctLi) correctLi.classList.add('correct');
+            }
+
+            localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+            document.getElementById('next-button').disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function prevQuestion() {
+            currentQuestionIndex--;
+            showQuestion();
+        }
+
+        function submitQuiz() {
+            totalCorrectAnswers = questions.reduce((sum, question, index) => {
+                const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
+                return sum + (userAnswers[index] === correctAnswer ? 1 : 0);
+            }, 0);
+
+            alert(`Điểm của bạn: ${totalCorrectAnswers} / ${questions.length}`);
+            document.getElementById('incorrect-list-container').style.display = 'none';
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            localStorage.removeItem('userAnswers');
+            showQuestion();
+        }
+
+        function showIncorrectQuestions() {
+            const incorrectList = document.getElementById('incorrect-list');
+            incorrectList.innerHTML = '';
+
+            questions.forEach((question, index) => {
+                const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
+                if (userAnswers[index] && userAnswers[index] !== correctAnswer) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div>${question.question}</div>
+                        <div class="answer incorrect">Bạn đã chọn: ${userAnswers[index]}</div>
+                        <div class="answer correct">Đáp án đúng: ${correctAnswer}</div>
+                    `;
+                    li.onclick = () => {
+                        currentQuestionIndex = index;
+                        showQuestion();
+                    };
+                    incorrectList.appendChild(li);
+                }
+            });
+
+            document.getElementById('incorrect-list-container').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
