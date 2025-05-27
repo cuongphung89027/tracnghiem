@@ -172,7 +172,7 @@
 <div id="overlay">
   <div id="overlay-content">
     <h3>Nhập mã sinh viên</h3>
-    <input type="text" id="student-id" placeholder="VD: 1234567890" style="width: 100%; padding: 10px; margin: 10px 0;" />
+    <input type="text" id="student-id" placeholder="VD: 1234567890" style="width: 100%; padding: 10px; margin: 10px 0;" onkeydown="if(event.key === 'Enter') verifyStudent()" />
     <button onclick="verifyStudent()">Xác nhận</button>
     <p id="student-msg" style="color: red; margin-top: 10px;"></p>
   </div>
@@ -359,12 +359,39 @@ function submitQuiz() {
       const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
       return sum + (userAnswers[index] === correctAnswer ? 1 : 0);
     }, 0);
+
     const percent = ((totalCorrectAnswers / questions.length) * 100).toFixed(1);
     document.getElementById("result-message").innerText = `🎉 Bạn trả lời đúng ${totalCorrectAnswers}/${questions.length} câu (${percent}%)`;
     submitted = true;
     updateSubmitButton();
     document.getElementById("incorrect-list-button").style.display = "block";
     document.getElementById("incorrect-list-container").style.display = "none";
+
+    // LẤY TÊN MÔN HỌC
+    const subjectDropdown = document.getElementById("subject-select");
+    const subjectName = subjectDropdown.options[subjectDropdown.selectedIndex].text;
+
+    // GỬI DỮ LIỆU VỀ GOOGLE SHEET
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('vi-VN');
+    const formattedTime = now.toLocaleTimeString('vi-VN');
+
+    const data = {
+      hoten: studentName,
+      masv: document.getElementById("student-id").value.trim().toUpperCase(),
+      ngay: formattedDate,
+      gio: formattedTime,
+      monhoc: subjectName,
+      diem: percent
+    };
+
+    fetch("https://script.google.com/macros/s/AKfycbwAcVo1YJL20H1AwzcPNH2y-ucIQjAcTgCIVktkomAof__Q6aLL87f1L0N8YeUe-s2DqA/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
   } else {
     questions = JSON.parse(JSON.stringify(originalQuestions));
     userAnswers = new Array(questions.length).fill(null);
