@@ -12,7 +12,7 @@ C.Phải là sự chuyên chế
 A.Chính trị là lợi ích, là quan hệ lợi ích, là đấu tranh giai cấp trước hết vì lợi ích kinh tế 
 B.Tổ chức chính quyền, quyền lực nhà nước, là sự tham gia vào công việc Nhà nước
 C.Biểu hiện tập trung của kinh tế, là việc xây dựng Nhà nước 
-D.Cả 4 phương án trên
+*D.Cả 4 phương án trên
 4. Chính trị là:
 A.Quan hệ giữa các giai cấp, các dân tộc, các quốc gia với vấn đề giành giữ, tổ chức và sử dụng quyền lực Nhà nước
 B.Sự tham gia của nhân dân vào công việc Nhà nước và xã hội
@@ -84,10 +84,10 @@ B.Phải biết chỉ huy mình trước khi chỉ huy người khác,
 C.Phải làm việc điều độ và biết giới hạn tham vọng
 *D.Cả 3 phương án trên
 18. Theo J. Lốc cơ trong trạng thái tự nhiên con người có những quyền:
-*A.Tự do, bình đẳng, tư hữu
-B.Tự do, được sống, mưu cầu hạnh phúc
-C.Tự do, bình đẳng, mưu cầu hạnh phúc
-D.Tự do, mưu cầu hạnh phúc, tư hữu
+A. Tự do, bình đẳng, tư hữu
+*B. Tự do, được sống, mưu cầu hạnh phúc
+C. Tự do, bình đẳng, mưu cầu hạnh phúc
+D. Tự do, mưu cầu hạnh phúc, tư hữu
 19. Theo Môngteckiơ, tự do chính trị của công dân là:
 *A.Quyền mà người ta có thể làm mọi cái mà luật pháp cho phép
 B. Quyền mà người ta có thể làm mọi cái mà luật pháp không cấm
@@ -105,13 +105,13 @@ C. Bảo toàn quyền tự nhiên của mỗi cá nhân” là tiêu chí căn 
 *D. cả 3 phương án trên
 22. Chỉ ra các trường phái tư tưởng chính trị tiêu biểu của thời Xuân Thu - Chiến Quốc (770-221TCN) 
 A. Nho Gia, Đạo gia; Mặc Gia
-*B.Nho Gia,  Mặc Gia;  Pháp Gia
+*B. Nho Gia,  Mặc Gia;  Pháp Gia
 C. Nho Gia, Danh Gia;  Mặc Gia
 D.Nho Gia, Pháp gia, Đạo Gia
 23. Học thuyết  của Khổng tử được xây dựng trên phạm trù cơ bản nào?
 A. Nhân - Trung - Tín
 B. Nhân -  Chính danh - Hiếu 
-*C.  Nhân - Lễ - Chính danh
+*C. Nhân - Lễ - Chính danh
 D. Nhân - Hiếu -  Lễ 
 24. “Nhân” theo Khổng tử là:
 A.Thương yêu con người , (ái nhân) thương yêu người thân của mình và yêu người nhân đức hơn (thân nhân). 
@@ -367,17 +367,16 @@ D.6 nhóm
 76. Những nhóm phẩm chất của thủ lĩnh chính trị gồm: 
 A.Trình độ hiểu biết và phẩm chất chính trị
 B.Năng lực tổ chức
-C.Đạo đức, tác phong 
-D.Khả năng làm việc
-*E.Tất cả đáp án trên
+C.Đạo đức, tác phong, khả năng làm việc
+*D.Tất cả đáp án trên
 77. Trình độ hiểu biết của người thủ lĩnh chính trị thể hiện ở:
 A. Thông minh, hiểu biết sâu rộng các lĩnh vực
 B. Có tư duy khoa học; nắm vững quy luật chính trị
 C. Làm chủ khoa học và công nghệ lãnh đạo, quản lý
 *D. Tất cả các phương án trên.
-78. Phẩm chất nào phản ánh khả năng đưa ra quyết định và lãnh đạo của một thủ lĩnh chính trị: ( này đáng không đáp án phải là KHẢ NĂNG LÀM VIỆC)
-A. Đạo đức tác phong.
-*B. Năng lực tổ chức.
+78. Phẩm chất nào phản ánh khả năng đưa ra quyết định và lãnh đạo của một thủ lĩnh chính trị: 
+*A. Đạo đức tác phong.
+B. Năng lực tổ chức.
 C. Khả năng sáng tạo nghệ thuật.
 D. Kỹ năng kinh doanh
 79. Phẩm chất chính trị của thủ lĩnh chính trị thể hiện qua yếu tố:
