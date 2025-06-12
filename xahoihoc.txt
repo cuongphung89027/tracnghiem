@@ -607,8 +607,8 @@ c. Đưa ra chính sách quản lý
 *d. Tất cả các đáp án trên
 122. Phương pháp phân tích tài liệu bao gồm mấy giai đoạn chính?
 a. 2
-b. 3
-*c. 4
+*b. 3
+c. 4
 d. 5
 123. Phương pháp phân tích tài liệu trong nghiên cứu xã hội học bao gồm các loại nào?
 *a. Phân tích định tính và phân tích định lượng.
@@ -621,9 +621,9 @@ b. Tạo dựng các giả thuyết nghiên cứu.
 c. Phân tích dữ liệu từ các tài liệu viết.
 d. Lựa chọn mẫu nghiên cứu cho cuộc khảo sát.
 125. Có bao nhiêu bước khi tiến hành quan sát?
-a. 3 bước
+*a. 3 bước
 b. 4 bước
-*c. 5 bước
+c. 5 bước
 d. 6 bước
 126. Một ưu điểm của phương pháp phỏng vấn là gì?
 a. Nhanh chóng thu thập số liệu định lượng
@@ -668,8 +668,8 @@ d. Không cần thiết trong nghiên cứu xã hội học
 134. Có mấy giai đoạn trong nghiên cứu xã hội học thực nghiệm?
 a. 01
 b. 02
-c. 03
-*d. 04
+*c. 03
+d. 04
 135. Một trong những yếu tố quan trọng cần chuẩn bị khi thực hiện một cuộc điều tra xã hội học là:
 *a. Xác định rõ mục tiêu và yêu cầu nghiên cứu
 b. Xác định được đối tượng điều tra một cách ngẫu nhiên
