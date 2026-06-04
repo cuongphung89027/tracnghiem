@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>QUIZEE by FINN</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
@@ -46,10 +46,11 @@
       backdrop-filter: blur(6px);
       z-index: 9999;
       display: flex; justify-content: center; align-items: center;
+      padding: 16px;
     }
     #overlay-content {
       background: white; padding: 40px 36px;
-      border-radius: 20px; width: 340px; text-align: center;
+      border-radius: 20px; width: 340px; max-width: 100%; text-align: center;
       box-shadow: var(--shadow-lg); animation: slideUp .3s ease;
     }
     @keyframes slideUp {
@@ -77,7 +78,7 @@
     #overlay-content .btn-login:active { transform: scale(.98); }
     #student-msg { color: var(--danger); font-size: 13px; margin-top: 12px; min-height: 18px; }
 
-    /* ── QUIZ CARD ── */
+    /* ── QUIZ CARD (PC & TABLET) ── */
     .quiz-container {
       background: white; border-radius: 20px; box-shadow: var(--shadow-lg);
       width: 660px; max-width: 100%; max-height: 92vh; overflow-y: auto;
@@ -119,6 +120,7 @@
       border: 1.5px solid var(--gray-200); border-radius: 10px;
       font-size: 14px; font-family: inherit; color: var(--gray-700);
       background: white; outline: none; cursor: pointer; transition: border-color .2s;
+      min-width: 0;
     }
     #subject-select:focus { border-color: var(--primary); }
     #shuffle-button {
@@ -270,8 +272,9 @@
     .chart-wrap { position: relative; height: 220px; margin-bottom: 22px; }
 
     /* History table */
-    .history-wrap { border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; }
-    .history-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .history-wrap { border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; width: 100%; }
+    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .history-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
     .history-wrap thead th { background: var(--gray-50); padding: 10px 14px; text-align: left; font-weight: 600; color: var(--gray-700); border-bottom: 1.5px solid var(--gray-200); }
     .history-wrap tbody td { padding: 9px 14px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
     .history-wrap tbody tr:last-child td { border-bottom: none; }
@@ -282,11 +285,34 @@
     .score-low  { background: var(--danger-light);  color: var(--danger); }
     .pm-loading { text-align: center; padding: 40px; color: var(--gray-500); font-size: 14px; }
     .pm-empty   { text-align: center; padding: 32px; color: var(--gray-400); font-size: 14px; }
+
+    /* ── MOBILE OPTIMIZATION ── */
+    @media (max-width: 680px) {
+      body { padding: 0; background: white; }
+      .quiz-container {
+        width: 100vw; height: 100vh; max-height: 100vh;
+        border-radius: 0; box-shadow: none; display: none; flex-direction: column;
+      }
+      .quiz-header { border-radius: 0; padding: 14px 16px; }
+      .quiz-brand { font-size: 18px; }
+      #greeting { display: none; }
+      .quiz-body { padding: 16px; flex: 1; }
+      #upload-container { gap: 8px; }
+      #subject-select { padding: 10px; font-size: 13px; }
+      #shuffle-button { padding: 10px 12px; font-size: 12px; }
+      #question-text { font-size: 15px; padding: 14px; margin-bottom: 14px; }
+      #progress-modal { padding: 0; }
+      #progress-panel { width: 100vw; min-height: 100vh; border-radius: 0; }
+      .pm-header { border-radius: 0; padding: 14px 16px; }
+      .pm-body { padding: 16px; }
+      .stat-card { padding: 10px 4px; }
+      .stat-card .val { font-size: 20px; }
+      .stat-card .lbl { font-size: 11px; }
+    }
   </style>
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
 <div id="overlay">
   <div id="overlay-content">
     <div class="overlay-logo">QUIZEE <span>by FINN</span></div>
@@ -299,7 +325,6 @@
   </div>
 </div>
 
-<!-- QUIZ APP -->
 <div class="quiz-container" id="quiz-app">
   <div class="quiz-header">
     <div class="quiz-brand">QUIZEE <span>by FINN</span></div>
@@ -349,7 +374,6 @@
   </div>
 </div>
 
-<!-- PROGRESS MODAL -->
 <div id="progress-modal">
   <div id="progress-panel">
     <div class="pm-header">
@@ -363,9 +387,6 @@
 </div>
 
 <script>
-  /* ─────────────────────────────────────────────
-     CONFIG — đổi URL sau khi re-deploy Apps Script
-  ───────────────────────────────────────────── */
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwAcVo1YJL20H1AwzcPNH2y-ucIQjAcTgCIVktkomAof__Q6aLL87f1L0N8YeUe-s2DqA/exec";
 
   /* ── STATE ── */
@@ -424,7 +445,7 @@
 
   function showApp() {
     document.getElementById("overlay").style.display = "none";
-    document.getElementById("quiz-app").style.display = "block";
+    document.getElementById("quiz-app").style.display = window.innerWidth <= 680 ? "flex" : "block";
     document.getElementById("greeting").innerText = `Xin chào ${studentName}`;
   }
 
@@ -433,8 +454,11 @@
     localStorage.removeItem('quizee_student_name');
     studentName = ""; studentIdValue = "";
     questions = []; userAnswers = []; submitted = false;
+    
+    document.getElementById("quiz-app").style.removeProperty('display');
     document.getElementById("quiz-app").style.display = "none";
     document.getElementById("overlay").style.display  = "flex";
+    
     document.getElementById("student-id").value = "";
     document.getElementById("student-msg").innerText = "";
     document.getElementById("subject-select").value = "";
@@ -559,7 +583,6 @@
       document.getElementById("action-row").classList.add("visible");
       document.getElementById("incorrect-list-container").style.display = "none";
 
-      // ── Ghi vào Google Sheets qua GET params + no-cors (đáng tin cậy nhất với GAS)
       const subjectName = document.getElementById("subject-select").selectedOptions[0].text;
       const now = new Date();
       const params = new URLSearchParams({
@@ -684,14 +707,11 @@ tr:last-child td{border-bottom:none}
     win.document.close(); win.focus();
   }
 
-  /* ════════════════════════════════════════════
-     PROGRESS MODAL
-  ════════════════════════════════════════════ */
+  /* ── PROGRESS MODAL ── */
   function openProgressModal() {
     document.getElementById("progress-modal").classList.add("open");
     document.getElementById("pm-body").innerHTML = '<div class="pm-loading">⏳ Đang tải dữ liệu…</div>';
     if (progressChart) { progressChart.destroy(); progressChart = null; }
-    // GAS doGet trả về JSON với CORS header — fetch thẳng được
     fetch(`${GAS_URL}?action=get&masv=${encodeURIComponent(studentIdValue)}`)
       .then(r => {
         if (!r.ok) throw new Error(r.status);
@@ -707,7 +727,6 @@ tr:last-child td{border-bottom:none}
   function closeProgressModal() {
     document.getElementById("progress-modal").classList.remove("open");
   }
-  // Đóng khi click nền
   document.getElementById("progress-modal").addEventListener("click", function(e) {
     if (e.target === this) closeProgressModal();
   });
@@ -719,7 +738,6 @@ tr:last-child td{border-bottom:none}
       return;
     }
 
-    // Nhóm theo môn
     const bySubject = {};
     rows.forEach(r => {
       const mon = r.monhoc || "Khác";
@@ -728,31 +746,30 @@ tr:last-child td{border-bottom:none}
     });
     const subjects = Object.keys(bySubject);
 
-    // Render khung
     const pmBody = document.getElementById("pm-body");
     pmBody.innerHTML = `
       <div class="stat-cards" id="stat-cards"></div>
       <div class="subject-tabs" id="subject-tabs"></div>
       <div class="chart-wrap"><canvas id="progress-chart"></canvas></div>
       <div class="history-wrap">
-        <table>
-          <thead><tr><th>Ngày</th><th>Giờ</th><th>Môn học</th><th>Điểm</th></tr></thead>
-          <tbody id="history-tbody"></tbody>
-        </table>
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>Ngày</th><th>Giờ</th><th>Môn học</th><th>Điểm</th></tr></thead>
+            <tbody id="history-tbody"></tbody>
+          </table>
+        </div>
       </div>`;
 
-    // Hàm cập nhật stat cards theo tập dữ liệu hiện tại
     function updateStats(subset) {
       const scores = subset.map(r => parseFloat(r.diem) || 0);
       const avg    = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '—';
       const best   = scores.length ? Math.max(...scores).toFixed(1) : '—';
       document.getElementById("stat-cards").innerHTML = `
-        <div class="stat-card"><div class="val">${subset.length}</div><div class="lbl">Lần làm bài</div></div>
-        <div class="stat-card"><div class="val">${avg}%</div><div class="lbl">Điểm trung bình</div></div>
-        <div class="stat-card"><div class="val">${best}%</div><div class="lbl">Điểm cao nhất</div></div>`;
+        <div class="stat-card"><div class="val">${subset.length}</div><div class="lbl">Lần làm</div></div>
+        <div class="stat-card"><div class="val">${avg}%</div><div class="lbl">Điểm TB</div></div>
+        <div class="stat-card"><div class="val">${best}%</div><div class="lbl">Cao nhất</div></div>`;
     }
 
-    // Tabs
     const tabsEl = document.getElementById("subject-tabs");
     const allBtn = document.createElement("button");
     allBtn.className = "subject-tab active"; allBtn.textContent = "Tất cả";
@@ -780,7 +797,6 @@ tr:last-child td{border-bottom:none}
     const ctx = document.getElementById("progress-chart");
     if (!ctx) return;
 
-    // Nhóm theo môn, lấy điểm trung bình mỗi môn để vẽ bar chart
     const byMon = {};
     rows.forEach(r => {
       const mon = r.monhoc || "Khác";
@@ -797,7 +813,6 @@ tr:last-child td{border-bottom:none}
       return palette[i % palette.length];
     });
 
-    // Nếu chỉ 1 môn thì vẽ line chart theo thời gian
     if (labels.length === 1) {
       const timeLabels = rows.map((r, i) => `Lần ${i + 1}`);
       const scores     = rows.map(r => parseFloat(r.diem) || 0);
@@ -828,14 +843,38 @@ tr:last-child td{border-bottom:none}
   function renderHistory(rows) {
     const tbody = document.getElementById("history-tbody");
     if (!tbody) return;
-    // Đảo ngược để lần làm mới nhất lên đầu
+    
+    // Hàm format thời gian để ép hiển thị dd/mm/yyyy và hh:mm:ss đúng mong muốn
+    function formatDateTime(dateTimeStr, type) {
+      if (!dateTimeStr) return '';
+      const d = new Date(dateTimeStr);
+      
+      if (isNaN(d.getTime())) return String(dateTimeStr).trim();
+      
+      if (type === 'date') {
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return year === 1899 ? '—' : `${day}/${month}/${year}`;
+      }
+      
+      if (type === 'time') {
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const seconds = String(d.getSeconds()).padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+      }
+      return String(dateTimeStr).trim();
+    }
+
     const sorted = [...rows].reverse();
     tbody.innerHTML = sorted.slice(0, 50).map(r => {
       const score = parseFloat(r.diem) || 0;
       const cls   = score >= 80 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
-      // ngay và gio đã là string được format từ Apps Script (dd/MM/yyyy, HH:mm:ss)
-      const ngay  = String(r.ngay || '').trim();
-      const gio   = String(r.gio  || '').trim();
+      
+      const ngay  = formatDateTime(r.ngay, 'date');
+      const gio   = formatDateTime(r.gio, 'time');
+      
       return `<tr>
         <td>${ngay}</td>
         <td>${gio}</td>
