@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QUIZEE by FINN</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -34,102 +35,54 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       padding: 20px;
     }
 
-    /* ── OVERLAY ── */
+    /* ── OVERLAY LOGIN ── */
     #overlay {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: rgba(0,0,0,.55);
       backdrop-filter: blur(6px);
       z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      display: flex; justify-content: center; align-items: center;
     }
     #overlay-content {
-      background: white;
-      padding: 40px 36px;
-      border-radius: 20px;
-      width: 340px;
-      text-align: center;
-      box-shadow: var(--shadow-lg);
-      animation: slideUp .3s ease;
+      background: white; padding: 40px 36px;
+      border-radius: 20px; width: 340px; text-align: center;
+      box-shadow: var(--shadow-lg); animation: slideUp .3s ease;
     }
     @keyframes slideUp {
       from { transform: translateY(20px); opacity: 0; }
       to   { transform: translateY(0);    opacity: 1; }
     }
-    .overlay-logo {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--primary);
-      letter-spacing: -0.5px;
-      margin-bottom: 4px;
-    }
+    .overlay-logo { font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; margin-bottom: 4px; }
     .overlay-logo span { color: var(--gray-400); font-weight: 400; font-size: 14px; }
-    #overlay-content h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--gray-900);
-      margin: 20px 0 8px;
-    }
-    #overlay-content p.sub {
-      font-size: 13px;
-      color: var(--gray-500);
-      margin-bottom: 20px;
-    }
+    #overlay-content h3 { font-size: 18px; font-weight: 600; color: var(--gray-900); margin: 20px 0 8px; }
+    #overlay-content p.sub { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; }
     #student-id {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 10px;
-      font-size: 15px;
-      font-family: inherit;
-      outline: none;
-      transition: border-color .2s;
-      text-align: center;
-      letter-spacing: 1px;
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-size: 15px; font-family: inherit; outline: none;
+      transition: border-color .2s; text-align: center; letter-spacing: 1px;
     }
     #student-id:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
     #overlay-content .btn-login {
-      margin-top: 14px;
-      width: 100%;
-      padding: 12px;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
+      margin-top: 14px; width: 100%; padding: 12px;
+      background: var(--primary); color: white; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
       transition: background .2s, transform .1s;
     }
     #overlay-content .btn-login:hover  { background: var(--primary-dark); }
     #overlay-content .btn-login:active { transform: scale(.98); }
-    #student-msg {
-      color: var(--danger);
-      font-size: 13px;
-      margin-top: 12px;
-      min-height: 18px;
-    }
+    #student-msg { color: var(--danger); font-size: 13px; margin-top: 12px; min-height: 18px; }
 
     /* ── QUIZ CARD ── */
     .quiz-container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: var(--shadow-lg);
-      width: 660px;
-      max-width: 100%;
-      max-height: 92vh;
-      overflow-y: auto;
-      display: none;
-      animation: slideUp .35s ease;
-      scrollbar-width: thin;
-      scrollbar-color: var(--gray-200) transparent;
+      background: white; border-radius: 20px; box-shadow: var(--shadow-lg);
+      width: 660px; max-width: 100%; max-height: 92vh; overflow-y: auto;
+      display: none; animation: slideUp .35s ease;
+      scrollbar-width: thin; scrollbar-color: var(--gray-200) transparent;
     }
     .quiz-container::-webkit-scrollbar { width: 6px; }
     .quiz-container::-webkit-scrollbar-track { background: transparent; }
@@ -138,186 +91,88 @@
     /* Header */
     .quiz-header {
       background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-      padding: 22px 28px 18px;
-      border-radius: 20px 20px 0 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      padding: 18px 22px; border-radius: 20px 20px 0 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
     }
-    .quiz-brand {
-      font-size: 22px;
-      font-weight: 700;
-      color: white;
-      letter-spacing: -0.5px;
-      flex-shrink: 0;
-    }
+    .quiz-brand { font-size: 20px; font-weight: 700; color: white; letter-spacing: -0.5px; flex-shrink: 0; }
     .quiz-brand span { opacity: .6; font-weight: 400; font-size: 13px; margin-left: 6px; }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .header-right { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
     #greeting {
-      font-size: 13px;
-      color: rgba(255,255,255,.9);
-      background: rgba(255,255,255,.15);
-      padding: 5px 12px;
-      border-radius: 99px;
+      font-size: 13px; color: rgba(255,255,255,.9);
+      background: rgba(255,255,255,.15); padding: 5px 12px; border-radius: 99px;
     }
-    #logout-button {
-      font-size: 12px;
-      font-weight: 600;
-      font-family: inherit;
-      color: rgba(255,255,255,.85);
-      background: rgba(255,255,255,.12);
-      border: 1px solid rgba(255,255,255,.25);
-      padding: 5px 12px;
-      border-radius: 99px;
-      cursor: pointer;
-      transition: background .2s;
-      white-space: nowrap;
+    .header-btn {
+      font-size: 12px; font-weight: 600; font-family: inherit;
+      color: rgba(255,255,255,.85); background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.25); padding: 5px 12px;
+      border-radius: 99px; cursor: pointer; transition: background .2s; white-space: nowrap;
     }
-    #logout-button:hover { background: rgba(255,255,255,.22); }
+    .header-btn:hover { background: rgba(255,255,255,.22); }
 
     /* Body */
-    .quiz-body { padding: 24px 28px; }
+    .quiz-body { padding: 22px 26px; }
 
     /* Toolbar */
-    #upload-container {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+    #upload-container { display: flex; gap: 10px; margin-bottom: 18px; }
     #subject-select {
-      flex: 1;
-      padding: 10px 14px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--gray-700);
-      background: white;
-      outline: none;
-      cursor: pointer;
-      transition: border-color .2s;
+      flex: 1; padding: 10px 14px;
+      border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-size: 14px; font-family: inherit; color: var(--gray-700);
+      background: white; outline: none; cursor: pointer; transition: border-color .2s;
     }
     #subject-select:focus { border-color: var(--primary); }
     #shuffle-button {
-      padding: 10px 16px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      background: white;
-      color: var(--gray-700);
-      transition: border-color .2s, background .2s;
-      white-space: nowrap;
+      padding: 10px 16px; border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer;
+      background: white; color: var(--gray-700); transition: border-color .2s, background .2s; white-space: nowrap;
     }
     #shuffle-button:hover { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
 
-    /* Progress */
-    .progress-bar-wrap { margin-bottom: 20px; }
-    .progress-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--gray-500);
-      margin-bottom: 6px;
-    }
+    /* Progress bar */
+    .progress-bar-wrap { margin-bottom: 18px; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray-500); margin-bottom: 6px; }
     .progress-meta strong { color: var(--gray-700); }
-    .progress-track {
-      height: 6px;
-      background: var(--gray-100);
-      border-radius: 99px;
-      overflow: hidden;
-    }
+    .progress-track { height: 6px; background: var(--gray-100); border-radius: 99px; overflow: hidden; }
     .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--primary), #7c3aed);
-      border-radius: 99px;
-      transition: width .4s ease;
-      width: 0%;
+      height: 100%; background: linear-gradient(90deg, var(--primary), #7c3aed);
+      border-radius: 99px; transition: width .4s ease; width: 0%;
     }
 
     /* Question */
     #question-text {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--gray-900);
-      line-height: 1.6;
-      margin-bottom: 18px;
-      padding: 18px 20px;
-      background: var(--gray-50);
-      border-radius: var(--radius);
-      border-left: 4px solid var(--primary);
+      font-size: 16px; font-weight: 600; color: var(--gray-900);
+      line-height: 1.6; margin-bottom: 16px; padding: 16px 18px;
+      background: var(--gray-50); border-radius: var(--radius); border-left: 4px solid var(--primary);
     }
 
     /* Answers */
     #answers { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     #answers li {
-      padding: 13px 16px;
-      background: white;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      cursor: pointer;
-      font-size: 14px;
-      color: var(--gray-700);
-      line-height: 1.5;
-      transition: border-color .2s, background .2s, transform .1s;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      padding: 12px 16px; background: white; border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius); cursor: pointer; font-size: 14px; color: var(--gray-700);
+      line-height: 1.5; transition: border-color .2s, background .2s, transform .1s;
+      display: flex; align-items: flex-start; gap: 10px;
     }
     #answers li::before {
       content: attr(data-label);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--gray-100);
-      color: var(--gray-500);
-      font-size: 12px;
-      font-weight: 600;
-      flex-shrink: 0;
-      transition: background .2s, color .2s;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 26px; height: 26px; border-radius: 50%;
+      background: var(--gray-100); color: var(--gray-500);
+      font-size: 12px; font-weight: 600; flex-shrink: 0; transition: background .2s, color .2s;
     }
-    #answers li:hover {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      transform: translateX(2px);
-    }
+    #answers li:hover { border-color: var(--primary); background: var(--primary-light); transform: translateX(2px); }
     #answers li:hover::before { background: var(--primary); color: white; }
-    .correct {
-      background: var(--success-light) !important;
-      border-color: var(--success) !important;
-      color: var(--success) !important;
-    }
-    .correct::before { background: var(--success) !important; color: white !important; }
-    .incorrect {
-      background: var(--danger-light) !important;
-      border-color: var(--danger) !important;
-      color: var(--danger) !important;
-    }
+    .correct  { background: var(--success-light) !important; border-color: var(--success) !important; color: var(--success) !important; }
+    .correct::before  { background: var(--success) !important; color: white !important; }
+    .incorrect { background: var(--danger-light) !important; border-color: var(--danger) !important; color: var(--danger) !important; }
     .incorrect::before { background: var(--danger) !important; color: white !important; }
     .selected { font-weight: 500; }
 
-    /* Nav buttons */
-    .nav-row { display: flex; gap: 10px; margin-top: 22px; }
+    /* Nav */
+    .nav-row { display: flex; gap: 10px; margin-top: 20px; }
     #back-button, #next-button {
-      flex: 1;
-      padding: 12px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all .2s;
+      flex: 1; padding: 12px; border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all .2s;
     }
     #back-button { background: white; color: var(--gray-700); }
     #back-button:not(:disabled):hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
@@ -327,117 +182,106 @@
 
     /* Submit */
     #submit-button {
-      width: 100%;
-      padding: 13px;
-      margin-top: 12px;
-      background: var(--danger);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
+      width: 100%; padding: 13px; margin-top: 12px;
+      background: var(--danger); color: white; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer;
       transition: background .2s, transform .1s;
     }
-    #submit-button:hover:not(:disabled)  { background: #b91c1c; }
+    #submit-button:hover:not(:disabled) { background: #b91c1c; }
     #submit-button:active { transform: scale(.99); }
     #submit-button:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; }
     #submit-button.retry { background: var(--success); }
     #submit-button.retry:hover { background: #15803d; }
 
-    /* Post-submit action buttons row */
-    .action-row {
-      display: none;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    /* Post-submit actions */
+    .action-row { display: none; gap: 10px; margin-top: 10px; }
     .action-row.visible { display: flex; }
     #incorrect-list-button, #print-button {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background .2s;
-      border: 1.5px solid;
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
+      transition: background .2s; border: 1.5px solid;
     }
-    #incorrect-list-button {
-      background: white;
-      color: var(--warning);
-      border-color: var(--warning);
-    }
+    #incorrect-list-button { background: white; color: var(--warning); border-color: var(--warning); }
     #incorrect-list-button:hover { background: var(--warning-light); }
-    #print-button {
-      background: white;
-      color: var(--primary);
-      border-color: var(--primary);
-    }
+    #print-button { background: white; color: var(--primary); border-color: var(--primary); }
     #print-button:hover { background: var(--primary-light); }
 
     /* Result */
     #result-message {
-      margin-top: 18px;
-      padding: 16px 20px;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 600;
-      text-align: center;
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      display: none;
+      margin-top: 16px; padding: 14px 18px; border-radius: var(--radius);
+      font-size: 15px; font-weight: 600; text-align: center;
+      background: var(--primary-light); color: var(--primary-dark); display: none;
     }
 
     /* Incorrect list */
-    #incorrect-list-container {
-      margin-top: 16px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      overflow: hidden;
-      display: none;
-    }
-    .incorrect-header {
-      padding: 12px 16px;
-      background: var(--gray-50);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gray-700);
-      border-bottom: 1px solid var(--gray-200);
-    }
-    #incorrect-list {
-      list-style: none;
-      max-height: 240px;
-      overflow-y: auto;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    #incorrect-list li {
-      padding: 12px 14px;
-      background: var(--danger-light);
-      border: 1px solid #fca5a5;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      line-height: 1.5;
-      transition: background .2s;
-    }
+    #incorrect-list-container { margin-top: 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; display: none; }
+    .incorrect-header { padding: 11px 15px; background: var(--gray-50); font-size: 13px; font-weight: 600; color: var(--gray-700); border-bottom: 1px solid var(--gray-200); }
+    #incorrect-list { list-style: none; max-height: 240px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+    #incorrect-list li { padding: 11px 13px; background: var(--danger-light); border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-size: 13px; line-height: 1.5; transition: background .2s; }
     #incorrect-list li:hover { background: #fecaca; }
-    #incorrect-list li .q-text { font-weight: 500; color: var(--gray-900); margin-bottom: 6px; }
+    #incorrect-list li .q-text { font-weight: 500; color: var(--gray-900); margin-bottom: 5px; }
     #incorrect-list li .answer { display: flex; align-items: flex-start; gap: 6px; margin-top: 3px; }
-    #incorrect-list li .answer .label {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 7px;
-      border-radius: 99px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    #incorrect-list li .answer .label { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
     #incorrect-list li .answer.wrong .label { background: #fca5a5; color: #7f1d1d; }
-    #incorrect-list li .answer.right .label { background: #86efac; color: #14532d; }
+    #incorrect-list li .answer.right  .label { background: #86efac; color: #14532d; }
+
+    /* ── PROGRESS MODAL ── */
+    #progress-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); backdrop-filter: blur(6px);
+      z-index: 8888; display: none; justify-content: center; align-items: flex-start;
+      padding: 30px 16px; overflow-y: auto;
+    }
+    #progress-modal.open { display: flex; }
+    #progress-panel {
+      background: white; border-radius: 20px; width: 700px; max-width: 100%;
+      box-shadow: var(--shadow-lg); animation: slideUp .3s ease;
+      overflow: hidden;
+    }
+    .pm-header {
+      background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+      padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .pm-header h2 { color: white; font-size: 18px; font-weight: 700; }
+    .pm-header .pm-close {
+      background: rgba(255,255,255,.2); border: none; color: white;
+      width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: background .2s;
+    }
+    .pm-header .pm-close:hover { background: rgba(255,255,255,.35); }
+    .pm-body { padding: 22px 24px; }
+
+    /* Summary cards */
+    .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: var(--gray-50); border: 1.5px solid var(--gray-200); border-radius: var(--radius); padding: 14px 16px; text-align: center; }
+    .stat-card .val { font-size: 26px; font-weight: 700; color: var(--primary); }
+    .stat-card .lbl { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+
+    /* Subject tabs */
+    .subject-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .subject-tab {
+      padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 1.5px solid var(--gray-200); background: white;
+      color: var(--gray-700); transition: all .2s; font-family: inherit;
+    }
+    .subject-tab:hover, .subject-tab.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+    /* Chart area */
+    .chart-wrap { position: relative; height: 220px; margin-bottom: 22px; }
+
+    /* History table */
+    .history-wrap { border: 1.5px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; }
+    .history-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .history-wrap thead th { background: var(--gray-50); padding: 10px 14px; text-align: left; font-weight: 600; color: var(--gray-700); border-bottom: 1.5px solid var(--gray-200); }
+    .history-wrap tbody td { padding: 9px 14px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
+    .history-wrap tbody tr:last-child td { border-bottom: none; }
+    .history-wrap tbody tr:hover td { background: var(--gray-50); }
+    .score-chip { display: inline-block; padding: 2px 10px; border-radius: 99px; font-weight: 600; font-size: 12px; }
+    .score-high { background: var(--success-light); color: var(--success); }
+    .score-mid  { background: var(--warning-light); color: var(--warning); }
+    .score-low  { background: var(--danger-light);  color: var(--danger); }
+    .pm-loading { text-align: center; padding: 40px; color: var(--gray-500); font-size: 14px; }
+    .pm-empty   { text-align: center; padding: 32px; color: var(--gray-400); font-size: 14px; }
   </style>
 </head>
 <body>
@@ -457,17 +301,15 @@
 
 <!-- QUIZ APP -->
 <div class="quiz-container" id="quiz-app">
-  <!-- Header -->
   <div class="quiz-header">
     <div class="quiz-brand">QUIZEE <span>by FINN</span></div>
     <div class="header-right">
       <div id="greeting"></div>
-      <button id="logout-button" onclick="logout()">↩ Đăng xuất</button>
+      <button class="header-btn" onclick="openProgressModal()">📊 Tiến độ</button>
+      <button class="header-btn" id="logout-button" onclick="logout()">↩ Đăng xuất</button>
     </div>
   </div>
-  <!-- Body -->
   <div class="quiz-body">
-    <!-- Toolbar -->
     <div id="upload-container">
       <select id="subject-select" onchange="loadSubjectFile(this.value)">
         <option value="">-- Chọn môn học --</option>
@@ -479,36 +321,27 @@
       </select>
       <button id="shuffle-button" onclick="shuffleQuestions()">⇄ Trộn câu</button>
     </div>
-    <!-- Progress -->
     <div class="progress-bar-wrap">
       <div class="progress-meta">
         <span>Tiến độ</span>
         <strong><span id="question-count">0</span> / <span id="total-questions">0</span></strong>
       </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
     </div>
-    <!-- Question -->
     <div id="question-container">
       <h2 id="question-text">Vui lòng chọn môn học để bắt đầu.</h2>
       <ul id="answers"></ul>
     </div>
-    <!-- Navigation -->
     <div class="nav-row">
       <button id="back-button" onclick="prevQuestion()" disabled>← Quay lại</button>
       <button id="next-button" onclick="nextQuestion()" disabled>Tiếp tục →</button>
     </div>
-    <!-- Submit -->
     <button id="submit-button" onclick="submitQuiz()" disabled>Nộp bài</button>
-    <!-- Post-submit actions -->
     <div class="action-row" id="action-row">
       <button id="incorrect-list-button" onclick="toggleIncorrectQuestions()">⚠ Xem câu sai</button>
       <button id="print-button" onclick="printReport()">🖨 In báo cáo</button>
     </div>
-    <!-- Result -->
     <div id="result-message"></div>
-    <!-- Incorrect list -->
     <div id="incorrect-list-container">
       <div class="incorrect-header">Các câu trả lời sai</div>
       <ul id="incorrect-list"></ul>
@@ -516,7 +349,25 @@
   </div>
 </div>
 
+<!-- PROGRESS MODAL -->
+<div id="progress-modal">
+  <div id="progress-panel">
+    <div class="pm-header">
+      <h2>📊 Tiến độ học tập</h2>
+      <button class="pm-close" onclick="closeProgressModal()">✕</button>
+    </div>
+    <div class="pm-body" id="pm-body">
+      <div class="pm-loading">Đang tải dữ liệu…</div>
+    </div>
+  </div>
+</div>
+
 <script>
+  /* ─────────────────────────────────────────────
+     CONFIG — đổi URL sau khi re-deploy Apps Script
+  ───────────────────────────────────────────── */
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwAcVo1YJL20H1AwzcPNH2y-ucIQjAcTgCIVktkomAof__Q6aLL87f1L0N8YeUe-s2DqA/exec";
+
   /* ── STATE ── */
   let currentQuestionIndex = 0;
   let questions = [];
@@ -527,8 +378,9 @@
   let studentName = "";
   let studentIdValue = "";
   const LABELS = ['A', 'B', 'C', 'D'];
+  let progressChart = null;
 
-  /* ── AUTO-LOGIN FROM LOCALSTORAGE ── */
+  /* ── AUTO-LOGIN ── */
   window.addEventListener('DOMContentLoaded', () => {
     const savedId   = localStorage.getItem('quizee_student_id');
     const savedName = localStorage.getItem('quizee_student_name');
@@ -542,41 +394,32 @@
   /* ── AUTH ── */
   function verifyStudent() {
     const inputId = document.getElementById("student-id").value.trim().toUpperCase();
-    if (!inputId) {
-      document.getElementById("student-msg").innerText = "Vui lòng nhập mã sinh viên.";
-      return;
-    }
+    if (!inputId) { document.getElementById("student-msg").innerText = "Vui lòng nhập mã sinh viên."; return; }
     document.getElementById("student-msg").innerText = "Đang xác thực…";
     fetch("https://raw.githubusercontent.com/cuongphung89027/tracnghiem/main/sinhvien.txt")
-      .then(res => res.text())
+      .then(r => r.text())
       .then(data => {
-        const lines = data.split('\n').map(l => l.trim());
-        for (const line of lines) {
+        for (const line of data.split('\n').map(l => l.trim())) {
           if (!line) continue;
           const hasAccess = line.startsWith("*");
-          const cleanLine = hasAccess ? line.slice(1).trim() : line;
-          const parts = cleanLine.split(/\s+/);
-          const id    = parts[0].toUpperCase();
-          const name  = parts.slice(1).join(" ");
+          const clean = hasAccess ? line.slice(1).trim() : line;
+          const parts = clean.split(/\s+/);
+          const id = parts[0].toUpperCase();
+          const name = parts.slice(1).join(" ");
           if (id === inputId) {
             if (!hasAccess) {
-              document.getElementById("student-msg").innerText =
-                `Xin chào ${name}, tài khoản chưa được cấp quyền truy cập.`;
+              document.getElementById("student-msg").innerText = `Xin chào ${name}, tài khoản chưa được cấp quyền truy cập.`;
               return;
             }
-            studentName    = name;
-            studentIdValue = inputId;
-            localStorage.setItem('quizee_student_id',   inputId);
+            studentName = name; studentIdValue = inputId;
+            localStorage.setItem('quizee_student_id', inputId);
             localStorage.setItem('quizee_student_name', name);
-            showApp();
-            return;
+            showApp(); return;
           }
         }
         document.getElementById("student-msg").innerText = "Mã sinh viên không tồn tại trong hệ thống.";
       })
-      .catch(() => {
-        document.getElementById("student-msg").innerText = "Không thể tải danh sách sinh viên.";
-      });
+      .catch(() => { document.getElementById("student-msg").innerText = "Không thể tải danh sách sinh viên."; });
   }
 
   function showApp() {
@@ -588,46 +431,37 @@
   function logout() {
     localStorage.removeItem('quizee_student_id');
     localStorage.removeItem('quizee_student_name');
-    studentName    = "";
-    studentIdValue = "";
-    questions      = [];
-    userAnswers    = [];
-    submitted      = false;
-    // Reset UI
+    studentName = ""; studentIdValue = "";
+    questions = []; userAnswers = []; submitted = false;
     document.getElementById("quiz-app").style.display = "none";
     document.getElementById("overlay").style.display  = "flex";
-    document.getElementById("student-id").value       = "";
-    document.getElementById("student-msg").innerText  = "";
-    document.getElementById("subject-select").value   = "";
+    document.getElementById("student-id").value = "";
+    document.getElementById("student-msg").innerText = "";
+    document.getElementById("subject-select").value = "";
     document.getElementById("question-text").innerText = "Vui lòng chọn môn học để bắt đầu.";
-    document.getElementById("answers").innerHTML       = "";
+    document.getElementById("answers").innerHTML = "";
     document.getElementById("result-message").style.display = "none";
     document.getElementById("action-row").classList.remove("visible");
     document.getElementById("incorrect-list-container").style.display = "none";
     document.getElementById("question-count").innerText  = "0";
     document.getElementById("total-questions").innerText = "0";
     document.getElementById("progress-fill").style.width = "0%";
-    document.getElementById("submit-button").disabled    = true;
-    document.getElementById("back-button").disabled      = true;
-    document.getElementById("next-button").disabled      = true;
+    document.getElementById("submit-button").disabled = true;
+    document.getElementById("back-button").disabled   = true;
+    document.getElementById("next-button").disabled   = true;
     updateSubmitButton();
   }
 
   /* ── LOAD SUBJECT ── */
   function loadSubjectFile(filename) {
     if (!filename) return;
-    const url = `https://raw.githubusercontent.com/cuongphung89027/tracnghiem/main/${filename}`;
-    fetch(url)
-      .then(response => {
-        if (!response.ok) throw new Error("Không thể tải file");
-        return response.text();
-      })
+    fetch(`https://raw.githubusercontent.com/cuongphung89027/tracnghiem/main/${filename}`)
+      .then(r => { if (!r.ok) throw new Error("Không thể tải file"); return r.text(); })
       .then(content => {
         parseQuestions(content);
-        userAnswers     = new Array(questions.length).fill(null);
+        userAnswers = new Array(questions.length).fill(null);
         originalQuestions = JSON.parse(JSON.stringify(questions));
-        currentQuestionIndex = 0;
-        submitted = false;
+        currentQuestionIndex = 0; submitted = false;
         updateSubmitButton();
         document.getElementById('action-row').classList.remove('visible');
         document.getElementById('result-message').style.display = 'none';
@@ -635,53 +469,52 @@
         document.getElementById('incorrect-list-container').style.display = 'none';
         showQuestion();
       })
-      .catch(err => { alert("Lỗi tải file: " + err.message); });
+      .catch(err => alert("Lỗi tải file: " + err.message));
   }
 
   /* ── PARSE ── */
   function parseQuestions(content) {
     questions = [];
-    const lines = content.split("\n");
-    let currentQuestion = '';
-    let answers = [];
-    lines.forEach(line => {
+    let currentQuestion = '', answers = [];
+    for (let line of content.split("\n")) {
       line = line.trim();
-      if (!line) return;
+      if (!line) continue;
       if (line.match(/^\d+\./)) {
         if (currentQuestion) questions.push({ question: currentQuestion, answers });
-        currentQuestion = line;
-        answers = [];
+        currentQuestion = line; answers = [];
       } else {
         const isCorrect = line.startsWith("*");
         answers.push({ text: isCorrect ? line.slice(1).trim() : line.trim(), isCorrect });
       }
-    });
+    }
     if (currentQuestion) questions.push({ question: currentQuestion, answers });
     document.getElementById('submit-button').disabled = questions.length === 0;
   }
 
-  /* ── SHOW QUESTION (dynamic answer buttons) ── */
+  /* ── SHOW QUESTION ── */
   function showQuestion() {
     const question = questions[currentQuestionIndex];
     document.getElementById('question-text').innerText = question.question;
-
     const answersEl = document.getElementById('answers');
     answersEl.innerHTML = '';
-
+    const userAnswer    = userAnswers[currentQuestionIndex];
+    const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
     question.answers.forEach((answer, index) => {
       const li = document.createElement('li');
       li.setAttribute('data-label', LABELS[index] || String.fromCharCode(65 + index));
       li.innerText = answer.text;
-      li.onclick = () => checkAnswer(li, index);
-
-      if (userAnswers[currentQuestionIndex] === answer.text) {
-        li.classList.add('selected');
+      li.onclick = () => checkAnswer(li);
+      if (userAnswer != null) {
+        if (answer.text === userAnswer) {
+          li.classList.add('selected');
+          li.classList.add(answer.text === correctAnswer ? 'correct' : 'incorrect');
+        } else if (answer.isCorrect) {
+          li.classList.add('correct');
+        }
       }
       answersEl.appendChild(li);
     });
-
-    const curr  = currentQuestionIndex + 1;
-    const total = questions.length;
+    const curr = currentQuestionIndex + 1, total = questions.length;
     document.getElementById("question-count").innerText  = curr;
     document.getElementById("total-questions").innerText = total;
     document.getElementById("progress-fill").style.width = ((curr / total) * 100) + "%";
@@ -690,16 +523,12 @@
   }
 
   /* ── CHECK ANSWER ── */
-  function checkAnswer(selected, selectedIndex) {
+  function checkAnswer(selected) {
     const answerItems = document.querySelectorAll("#answers li");
     answerItems.forEach(li => li.classList.remove("selected", "correct", "incorrect"));
-
-    const question      = questions[currentQuestionIndex];
-    const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
-
+    const correctAnswer = questions[currentQuestionIndex].answers.find(a => a.isCorrect)?.text;
     selected.classList.add("selected");
     userAnswers[currentQuestionIndex] = selected.innerText;
-
     if (selected.innerText === correctAnswer) {
       selected.classList.add("correct");
     } else {
@@ -711,64 +540,46 @@
   }
 
   /* ── NAVIGATION ── */
-  function nextQuestion() {
-    if (currentQuestionIndex < questions.length - 1) {
-      currentQuestionIndex++;
-      showQuestion();
-    }
-  }
-  function prevQuestion() {
-    if (currentQuestionIndex > 0) {
-      currentQuestionIndex--;
-      showQuestion();
-    }
-  }
+  function nextQuestion() { if (currentQuestionIndex < questions.length - 1) { currentQuestionIndex++; showQuestion(); } }
+  function prevQuestion() { if (currentQuestionIndex > 0) { currentQuestionIndex--; showQuestion(); } }
 
   /* ── SUBMIT ── */
   function submitQuiz() {
     if (!submitted) {
-      totalCorrectAnswers = questions.reduce((sum, question, index) => {
-        const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
-        return sum + (userAnswers[index] === correctAnswer ? 1 : 0);
+      totalCorrectAnswers = questions.reduce((sum, q, i) => {
+        const correct = q.answers.find(a => a.isCorrect)?.text;
+        return sum + (userAnswers[i] === correct ? 1 : 0);
       }, 0);
-
-      const percent  = ((totalCorrectAnswers / questions.length) * 100).toFixed(1);
+      const percent = ((totalCorrectAnswers / questions.length) * 100).toFixed(1);
       const resultEl = document.getElementById("result-message");
       resultEl.style.display = "block";
       resultEl.innerText = `🎉 Bạn trả lời đúng ${totalCorrectAnswers}/${questions.length} câu — ${percent}%`;
-
       submitted = true;
       updateSubmitButton();
       document.getElementById("action-row").classList.add("visible");
       document.getElementById("incorrect-list-container").style.display = "none";
 
-      // Send to Google Sheets
-      const subjectDropdown = document.getElementById("subject-select");
-      const subjectName = subjectDropdown.options[subjectDropdown.selectedIndex].text;
-      const now  = new Date();
-      const data = {
-        hoten: studentName,
-        masv:  studentIdValue,
-        ngay:  now.toLocaleDateString('vi-VN'),
-        gio:   now.toLocaleTimeString('vi-VN'),
-        monhoc: subjectName,
-        diem:  percent
-      };
-      fetch("https://script.google.com/macros/s/AKfycbwAcVo1YJL20H1AwzcPNH2y-ucIQjAcTgCIVktkomAof__Q6aLL87f1L0N8YeUe-s2DqA/exec", {
-        method: "POST", mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+      // ── Ghi vào Google Sheets qua GET params + no-cors (đáng tin cậy nhất với GAS)
+      const subjectName = document.getElementById("subject-select").selectedOptions[0].text;
+      const now = new Date();
+      const params = new URLSearchParams({
+        action:  'post',
+        hoten:   studentName,
+        masv:    studentIdValue,
+        ngay:    now.toLocaleDateString('vi-VN'),
+        gio:     now.toLocaleTimeString('vi-VN'),
+        monhoc:  subjectName,
+        diem:    percent
       });
+      fetch(`${GAS_URL}?${params.toString()}`, { mode: 'no-cors' });
 
     } else {
-      // Retry
       questions   = JSON.parse(JSON.stringify(originalQuestions));
       userAnswers = new Array(questions.length).fill(null);
-      currentQuestionIndex = 0;
-      submitted = false;
+      currentQuestionIndex = 0; submitted = false;
       updateSubmitButton();
       document.getElementById('result-message').style.display = 'none';
-      document.getElementById('result-message').innerText     = '';
+      document.getElementById('result-message').innerText = '';
       document.getElementById("action-row").classList.remove("visible");
       document.getElementById("incorrect-list-container").style.display = 'none';
       showQuestion();
@@ -777,58 +588,45 @@
 
   function updateSubmitButton() {
     const btn = document.getElementById("submit-button");
-    if (submitted) {
-      btn.innerText = "↺ Làm lại bài";
-      btn.classList.add("retry");
-    } else {
-      btn.innerText = "Nộp bài";
-      btn.classList.remove("retry");
-    }
+    btn.innerText = submitted ? "↺ Làm lại bài" : "Nộp bài";
+    btn.classList.toggle("retry", submitted);
   }
 
   /* ── INCORRECT LIST ── */
   function toggleIncorrectQuestions() {
     const container = document.getElementById("incorrect-list-container");
-    if (container.style.display === 'block') {
-      container.style.display = 'none';
-      return;
-    }
-    const incorrectList = document.getElementById("incorrect-list");
-    incorrectList.innerHTML = "";
-    let hasIncorrect = false;
-    questions.forEach((question, index) => {
-      const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
-      if (userAnswers[index] && userAnswers[index] !== correctAnswer) {
-        hasIncorrect = true;
+    if (container.style.display === 'block') { container.style.display = 'none'; return; }
+    const list = document.getElementById("incorrect-list");
+    list.innerHTML = "";
+    let hasAny = false;
+    questions.forEach((q, i) => {
+      const correct = q.answers.find(a => a.isCorrect)?.text;
+      if (userAnswers[i] && userAnswers[i] !== correct) {
+        hasAny = true;
         const li = document.createElement("li");
         li.innerHTML = `
-          <div class="q-text">${question.question}</div>
-          <div class="answer wrong"><span class="label">Bạn chọn</span><span>${userAnswers[index]}</span></div>
-          <div class="answer right"><span class="label">Đúng</span><span>${correctAnswer}</span></div>
-        `;
-        li.onclick = () => { currentQuestionIndex = index; showQuestion(); };
-        incorrectList.appendChild(li);
+          <div class="q-text">${q.question}</div>
+          <div class="answer wrong"><span class="label">Bạn chọn</span><span>${userAnswers[i]}</span></div>
+          <div class="answer right"><span class="label">Đúng</span><span>${correct}</span></div>`;
+        li.onclick = () => { currentQuestionIndex = i; showQuestion(); };
+        list.appendChild(li);
       }
     });
-    if (!hasIncorrect) {
-      incorrectList.innerHTML = '<li style="background:var(--success-light);border-color:#86efac;color:var(--success);cursor:default">🎉 Bạn không có câu nào sai!</li>';
-    }
+    if (!hasAny) list.innerHTML = '<li style="background:var(--success-light);border-color:#86efac;color:var(--success);cursor:default">🎉 Bạn không có câu nào sai!</li>';
     container.style.display = 'block';
   }
 
   /* ── SHUFFLE ── */
   function shuffleQuestions() {
-    if (questions.length === 0) return;
+    if (!questions.length) return;
     for (let i = questions.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [questions[i], questions[j]] = [questions[j], questions[i]];
     }
     userAnswers = new Array(questions.length).fill(null);
-    currentQuestionIndex = 0;
-    submitted = false;
+    currentQuestionIndex = 0; submitted = false;
     updateSubmitButton();
     document.getElementById('result-message').style.display = 'none';
-    document.getElementById('result-message').innerText     = '';
     document.getElementById("action-row").classList.remove("visible");
     document.getElementById("incorrect-list-container").style.display = 'none';
     showQuestion();
@@ -836,91 +634,215 @@
 
   /* ── PRINT REPORT ── */
   function printReport() {
-    const subjectDropdown = document.getElementById("subject-select");
-    const subjectName = subjectDropdown.options[subjectDropdown.selectedIndex].text;
-    const now     = new Date();
+    const subjectName = document.getElementById("subject-select").selectedOptions[0].text;
+    const now = new Date();
     const percent = ((totalCorrectAnswers / questions.length) * 100).toFixed(1);
-
     let tableRows = '';
-    questions.forEach((question, index) => {
-      const correctAnswer = question.answers.find(a => a.isCorrect)?.text;
-      const userAnswer    = userAnswers[index];
-      const isCorrect     = userAnswer === correctAnswer;
-      const answered      = userAnswer != null;
-      let statusIcon, rowBg;
-      if (!answered) {
-        statusIcon = '<span style="color:#6b7280">—</span>';
-        rowBg = '';
-      } else if (isCorrect) {
-        statusIcon = '<span style="color:#16a34a;font-size:16px">✓</span>';
-        rowBg = 'background:#f0fdf4';
-      } else {
-        statusIcon = '<span style="color:#dc2626;font-size:16px">✗</span>';
-        rowBg = 'background:#fff5f5';
-      }
-      tableRows += `
-        <tr style="${rowBg}">
-          <td style="text-align:center;font-weight:600;color:#4f46e5">${index + 1}</td>
-          <td>${question.question}</td>
-          <td style="color:${answered ? (isCorrect ? '#16a34a' : '#dc2626') : '#6b7280'}">${userAnswer || '<i>Chưa trả lời</i>'}</td>
-          <td style="color:#16a34a;font-weight:500">${correctAnswer}</td>
-          <td style="text-align:center">${statusIcon}</td>
-        </tr>
-      `;
+    questions.forEach((q, i) => {
+      const correct  = q.answers.find(a => a.isCorrect)?.text;
+      const user     = userAnswers[i];
+      const ok       = user === correct;
+      const answered = user != null;
+      const icon  = !answered ? '—' : (ok ? '✓' : '✗');
+      const rowBg = !answered ? '' : (ok ? 'background:#f0fdf4' : 'background:#fff5f5');
+      const iconColor = !answered ? '#6b7280' : (ok ? '#16a34a' : '#dc2626');
+      tableRows += `<tr style="${rowBg}">
+        <td style="text-align:center;font-weight:600;color:#4f46e5">${i + 1}</td>
+        <td>${q.question}</td>
+        <td style="color:${answered ? (ok ? '#16a34a' : '#dc2626') : '#6b7280'}">${user || '<i>Chưa trả lời</i>'}</td>
+        <td style="color:#16a34a;font-weight:500">${correct}</td>
+        <td style="text-align:center;color:${iconColor};font-size:16px">${icon}</td></tr>`;
+    });
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">
+<title>Báo cáo — ${studentName}</title><style>
+@media print{.no-print{display:none}}
+body{font-family:Arial,sans-serif;padding:24px;color:#111827}
+h1{color:#4f46e5;font-size:22px;margin-bottom:4px}
+.sub{color:#6b7280;font-size:13px;margin-bottom:20px}
+.info{display:flex;flex-wrap:wrap;gap:12px 32px;margin-bottom:20px;padding:16px;background:#f9fafb;border-radius:10px;border:1px solid #e5e7eb}
+.info label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;display:block}
+.info span{font-size:15px;font-weight:500;color:#111827}
+.badge{background:#4f46e5;color:white;padding:8px 18px;border-radius:99px;font-size:18px;font-weight:700;display:inline-block;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:#4f46e5;color:white;padding:10px 12px;text-align:left;font-weight:600}
+tbody td{padding:9px 12px;border-bottom:1px solid #e5e7eb;vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:none}
+.btn{margin-bottom:16px;padding:10px 22px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+</style></head><body>
+<button class="btn no-print" onclick="window.print()">🖨 In / Lưu PDF</button>
+<h1>📋 Báo cáo kết quả làm bài</h1><p class="sub">QUIZEE by FINN</p>
+<div class="info">
+  <div><label>Họ và tên</label><span>${studentName}</span></div>
+  <div><label>Mã sinh viên</label><span>${studentIdValue}</span></div>
+  <div><label>Môn học</label><span>${subjectName}</span></div>
+  <div><label>Ngày giờ</label><span>${now.toLocaleDateString('vi-VN')} ${now.toLocaleTimeString('vi-VN')}</span></div>
+</div>
+<div class="badge">Kết quả: ${totalCorrectAnswers}/${questions.length} câu đúng — ${percent}%</div>
+<table><thead><tr><th style="width:40px">#</th><th>Câu hỏi</th><th>Bạn chọn</th><th>Đáp án đúng</th><th style="width:60px;text-align:center">Kết quả</th></tr></thead>
+<tbody>${tableRows}</tbody></table></body></html>`);
+    win.document.close(); win.focus();
+  }
+
+  /* ════════════════════════════════════════════
+     PROGRESS MODAL
+  ════════════════════════════════════════════ */
+  function openProgressModal() {
+    document.getElementById("progress-modal").classList.add("open");
+    document.getElementById("pm-body").innerHTML = '<div class="pm-loading">⏳ Đang tải dữ liệu…</div>';
+    if (progressChart) { progressChart.destroy(); progressChart = null; }
+    // GAS doGet trả về JSON với CORS header — fetch thẳng được
+    fetch(`${GAS_URL}?action=get&masv=${encodeURIComponent(studentIdValue)}`)
+      .then(r => {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      })
+      .then(rows => renderProgress(rows))
+      .catch(err => {
+        document.getElementById("pm-body").innerHTML =
+          `<div class="pm-empty">⚠️ Không thể tải dữ liệu (${err.message}).<br>Hãy cập nhật Apps Script rồi deploy lại.</div>`;
+      });
+  }
+
+  function closeProgressModal() {
+    document.getElementById("progress-modal").classList.remove("open");
+  }
+  // Đóng khi click nền
+  document.getElementById("progress-modal").addEventListener("click", function(e) {
+    if (e.target === this) closeProgressModal();
+  });
+
+  function renderProgress(rows) {
+    if (!rows || rows.length === 0) {
+      document.getElementById("pm-body").innerHTML =
+        '<div class="pm-empty">📭 Chưa có dữ liệu làm bài nào được ghi lại.</div>';
+      return;
+    }
+
+    // Nhóm theo môn
+    const bySubject = {};
+    rows.forEach(r => {
+      const mon = r.monhoc || "Khác";
+      if (!bySubject[mon]) bySubject[mon] = [];
+      bySubject[mon].push(r);
+    });
+    const subjects = Object.keys(bySubject);
+
+    // Render khung
+    const pmBody = document.getElementById("pm-body");
+    pmBody.innerHTML = `
+      <div class="stat-cards" id="stat-cards"></div>
+      <div class="subject-tabs" id="subject-tabs"></div>
+      <div class="chart-wrap"><canvas id="progress-chart"></canvas></div>
+      <div class="history-wrap">
+        <table>
+          <thead><tr><th>Ngày</th><th>Giờ</th><th>Môn học</th><th>Điểm</th></tr></thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>`;
+
+    // Hàm cập nhật stat cards theo tập dữ liệu hiện tại
+    function updateStats(subset) {
+      const scores = subset.map(r => parseFloat(r.diem) || 0);
+      const avg    = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '—';
+      const best   = scores.length ? Math.max(...scores).toFixed(1) : '—';
+      document.getElementById("stat-cards").innerHTML = `
+        <div class="stat-card"><div class="val">${subset.length}</div><div class="lbl">Lần làm bài</div></div>
+        <div class="stat-card"><div class="val">${avg}%</div><div class="lbl">Điểm trung bình</div></div>
+        <div class="stat-card"><div class="val">${best}%</div><div class="lbl">Điểm cao nhất</div></div>`;
+    }
+
+    // Tabs
+    const tabsEl = document.getElementById("subject-tabs");
+    const allBtn = document.createElement("button");
+    allBtn.className = "subject-tab active"; allBtn.textContent = "Tất cả";
+    allBtn.onclick = () => { setActiveTab(allBtn); updateStats(rows); drawChart(rows); renderHistory(rows); };
+    tabsEl.appendChild(allBtn);
+    subjects.forEach(mon => {
+      const btn = document.createElement("button");
+      btn.className = "subject-tab"; btn.textContent = mon;
+      btn.onclick = () => { setActiveTab(btn); updateStats(bySubject[mon]); drawChart(bySubject[mon]); renderHistory(bySubject[mon]); };
+      tabsEl.appendChild(btn);
     });
 
-    const html = `<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Báo cáo kết quả — ${studentName}</title>
-  <style>
-    @media print { body { padding: 0; } .no-print { display: none; } }
-    body { font-family: Arial, sans-serif; padding: 24px; color: #111827; }
-    h1 { color: #4f46e5; font-size: 22px; margin-bottom: 4px; }
-    .subtitle { color: #6b7280; font-size: 13px; margin-bottom: 20px; }
-    .info-grid { display: flex; flex-wrap: wrap; gap: 12px 32px; margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 10px; border: 1px solid #e5e7eb; }
-    .info-item label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; display: block; }
-    .info-item span  { font-size: 15px; font-weight: 500; color: #111827; }
-    .score-badge { background: #4f46e5; color: white; padding: 8px 18px; border-radius: 99px; font-size: 18px; font-weight: 700; display: inline-block; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead th { background: #4f46e5; color: white; padding: 10px 12px; text-align: left; font-weight: 600; }
-    tbody td { padding: 9px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; line-height: 1.5; }
-    tr:last-child td { border-bottom: none; }
-    .btn-print { margin-bottom: 16px; padding: 10px 22px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
-    .btn-print:hover { background: #3730a3; }
-  </style>
-</head>
-<body>
-  <button class="btn-print no-print" onclick="window.print()">🖨 In / Lưu PDF</button>
-  <h1>📋 Báo cáo kết quả làm bài</h1>
-  <p class="subtitle">QUIZEE by FINN</p>
-  <div class="info-grid">
-    <div class="info-item"><label>Họ và tên</label><span>${studentName}</span></div>
-    <div class="info-item"><label>Mã sinh viên</label><span>${studentIdValue}</span></div>
-    <div class="info-item"><label>Môn học</label><span>${subjectName}</span></div>
-    <div class="info-item"><label>Ngày giờ</label><span>${now.toLocaleDateString('vi-VN')} ${now.toLocaleTimeString('vi-VN')}</span></div>
-  </div>
-  <div class="score-badge">Kết quả: ${totalCorrectAnswers}/${questions.length} câu đúng — ${percent}%</div>
-  <table>
-    <thead>
-      <tr>
-        <th style="width:40px">#</th>
-        <th>Câu hỏi</th>
-        <th>Bạn chọn</th>
-        <th>Đáp án đúng</th>
-        <th style="width:60px;text-align:center">Kết quả</th>
-      </tr>
-    </thead>
-    <tbody>${tableRows}</tbody>
-  </table>
-</body>
-</html>`;
+    updateStats(rows);
+    drawChart(rows);
+    renderHistory(rows);
+  }
 
-    const win = window.open('', '_blank');
-    win.document.write(html);
-    win.document.close();
-    win.focus();
+  function setActiveTab(activeBtn) {
+    document.querySelectorAll(".subject-tab").forEach(b => b.classList.remove("active"));
+    activeBtn.classList.add("active");
+  }
+
+  function drawChart(rows) {
+    if (progressChart) { progressChart.destroy(); progressChart = null; }
+    const ctx = document.getElementById("progress-chart");
+    if (!ctx) return;
+
+    // Nhóm theo môn, lấy điểm trung bình mỗi môn để vẽ bar chart
+    const byMon = {};
+    rows.forEach(r => {
+      const mon = r.monhoc || "Khác";
+      if (!byMon[mon]) byMon[mon] = [];
+      byMon[mon].push(parseFloat(r.diem) || 0);
+    });
+    const labels = Object.keys(byMon);
+    const avgs   = labels.map(m => {
+      const arr = byMon[m];
+      return parseFloat((arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1));
+    });
+    const colors = labels.map((_, i) => {
+      const palette = ['#4f46e5','#7c3aed','#0ea5e9','#16a34a','#d97706','#dc2626'];
+      return palette[i % palette.length];
+    });
+
+    // Nếu chỉ 1 môn thì vẽ line chart theo thời gian
+    if (labels.length === 1) {
+      const timeLabels = rows.map((r, i) => `Lần ${i + 1}`);
+      const scores     = rows.map(r => parseFloat(r.diem) || 0);
+      progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timeLabels,
+          datasets: [{ label: labels[0], data: scores, borderColor: colors[0], backgroundColor: colors[0] + '22', fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: colors[0] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } }, scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } } }
+      });
+    } else {
+      progressChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ label: 'Điểm TB (%)', data: avgs, backgroundColor: colors, borderRadius: 8, borderSkipped: false }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }
+        }
+      });
+    }
+  }
+
+  function renderHistory(rows) {
+    const tbody = document.getElementById("history-tbody");
+    if (!tbody) return;
+    // Đảo ngược để lần làm mới nhất lên đầu
+    const sorted = [...rows].reverse();
+    tbody.innerHTML = sorted.slice(0, 50).map(r => {
+      const score = parseFloat(r.diem) || 0;
+      const cls   = score >= 80 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
+      // ngay và gio đã là string được format từ Apps Script (dd/MM/yyyy, HH:mm:ss)
+      const ngay  = String(r.ngay || '').trim();
+      const gio   = String(r.gio  || '').trim();
+      return `<tr>
+        <td>${ngay}</td>
+        <td>${gio}</td>
+        <td>${r.monhoc || ''}</td>
+        <td><span class="score-chip ${cls}">${r.diem}%</span></td>
+      </tr>`;
+    }).join('');
   }
 </script>
 </body>
